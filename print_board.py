@@ -1,10 +1,44 @@
 import numpy as np
 
 def valid_board(buildings,players,dim):
-	print "valid"
-
+	''' verifies current board is valid according to 
+		logistics and game rules '''
+	player_names = {0:"P1A", 1:"P1B", 2:"P2A", 3:"P2B"}
+	
+	# no players on same square
+	if len(players) > len(set(players)):
+		print "ERROR: Two players cannot be on the same square!"
+		return False
+	# no players outside of board bounds
+	for i,(x,y) in enumerate(players):
+		if x < 0 or x > dim-1 or y < 0 or y > dim-1:
+			print "ERROR: Player",player_names[i],"moved out of the bounds of the board."
+			return False
+	# no players on capped buildings
+	for loc in players:
+		if buildings[loc[0]][loc[1]] == 4:
+			print "ERROR: A player cannot stand on a building which has been crowned!"
+			return False
+	# building size valid
+	for row in buildings:
+		for building in row:
+			if building < 0:
+				print "ERROR: Building cannot be at level lower than 0."
+				return False
+			if building > 4:
+				print "ERROR: The maximum level of a building is 4."
+				return False
+	return True
 
 def print_board(buildings,players,dim):
+	''' print current status of board as grid '''
+
+	# check that board is valid before printing
+	if not valid_board(buildings,players,dim):
+		print "Cannot print board."
+		return False
+
+	# standard strings to print pieces of board
 	player_labels   = ['  P1A  ','  P1B  ','  P2A  ','  P2B  ']
 	building_labels = ['       ',' * * * ','  * *  ','   *   ']
 	blank_space   = '       '
@@ -48,11 +82,3 @@ def print_board(buildings,players,dim):
 		print low_row
 
 	print row_line
-
-buildings = np.asarray([[2,1,0,0,3],
-					    [4,2,0,0,0],
-					    [3,2,0,1,0],
-					    [0,2,0,0,2],
-					    [3,0,1,0,4]])
-
-print_board(buildings,[(0,0),(1,2),(4,2),(3,3)],len(buildings))
