@@ -12,8 +12,10 @@ class Position:
 		self.y_pos += other_pos.y_pos
 
 	def __sub__(self,other_pos):
-		self.x_pos -= other_pos.x_pos
-		self.y_pos -= other_pos.y_pos
+		x_res = self.x() - other_pos.x()
+		y_res = self.y() - other_pos.y()
+
+		return Position(x_res, y_res)
 
 	def x(self):
 		return self.x_pos
@@ -51,7 +53,10 @@ class Space:
 	def leave(self):
 		self.occupied = False
 
-	def get_location(self):
+	def get_coords(self):
+		return ( self.location.x(), self.location.y() )
+
+	def get_loc(self):
 		return self.location
 
 	def get_level(self):
@@ -78,12 +83,18 @@ class Board:
 			s += '\n'
 		return s
 
-	def get_space(self, loc):
-		if loc.x() < 0 or loc.y() < 0:
+	def get_dim(self):
+		return self.dim
+
+	def get_spaces(self):
+		return self.spaces
+
+	def get_space(self, x, y):
+		if x < 0 or y < 0:
 			print("ERROR: Attempt to access space above or to the left of board boundaries.")
 			return False
 		try:
-			return self.spaces[loc.y()][loc.x()]
+			return self.spaces[y][x]
 		except IndexError:
 			print("ERROR: Attempt to access space below or to right of board boundaries.")
 			return False
@@ -99,7 +110,10 @@ class Player:
 	def __str__(self):
 		return "Player %s has piece A at %s and piece B at %s" % (self.name, self.pieces[0].location, self.pieces[1].location)
 
-	def get_piece_loc(self, piece_num):
+	def get_pieces(self):
+		return self.pieces
+
+	def get_piece_space(self, piece_num):
 		return self.pieces[piece_num]
 
 	def move_piece(self, piece_num, new_space):
