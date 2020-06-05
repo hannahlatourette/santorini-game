@@ -38,7 +38,6 @@ class Game:
 		for p in players:
 			for l in p.get_pieces():
 				pieces.append( (l.get_loc().x(), l.get_loc().y()) )
-		print(pieces)
 		return pieces
 
 	def next_turn(self):
@@ -78,21 +77,30 @@ class Game:
 			current_space.leave() # mark old space unoccupied
 			new_space.occupy() # mark new space occupied
 
-	def valid_build(self, new_space):
+	def valid_build(self, player_space, build_space):
+		# must build directly around current space
+		diff = player_space.get_loc() - build_space.get_loc()
+		if (diff.x() == 0) and (diff.y() == 0):
+			print("ERROR: Can't build where your piece currently stands!")
+			return False
+		elif abs(diff.x()) > 1 or abs(diff.y()) > 1:
+			print("ERROR: Attempt to build a level too far from current piece!")
+			return False		
 		# cannot build on occupied space
-		if new_space.is_occupied():
+		if build_space.is_occupied():
 			print("ERROR: Cannot build on an occupied space!")
 			return False
-		# no pieces on crowned spaces
-		if new_space.get_level() == 4:
+		# spaces cannot have more than 4 levels
+		if build_space.get_level() == 4:
 			print("ERROR: This space has been crowned, no more room to build!")
 			return False
 		return True
 
-	def build_level(self, x, y):
-		space = self.board.get_space(x, y)
-		if self.valid_build(space):
-			space.build()
+	def build_level(self, player, piece_num, x, y):
+		player_space = player.get_piece_space(piece_num)
+		build_space = self.board.get_space(x, y)
+		if self.valid_build(player_space, build_space):
+			build_space.build()
 
 	def __str__(self):
 
